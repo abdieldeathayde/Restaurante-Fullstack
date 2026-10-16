@@ -1,0 +1,38 @@
+<div class="app-shell">
+<header class="topbar">
+  <a class="brand" href="#inicio"><span class="brand-mark">S</span><span>Sabor<span class="accent">ê.</span><small>COZINHA ARTESANAL</small></span></a>
+  <nav class="desktop-nav"><a href="#inicio">Início</a><a href="#cardapio">Cardápio</a><a href="#sobre">Nossa história</a></nav>
+  <button class="cart-button" (click)="cartOpen=true" aria-label="Abrir carrinho">🛍 <span class="cart-label">Meu pedido</span><b>{{cartCount}}</b></button>
+</header>
+<main>
+<section class="hero" id="inicio">
+ <div class="hero-copy"><div class="eyebrow">— FEITO COM INGREDIENTES DE VERDADE</div>
+ <h1>Comida boa.<br><em>Momentos melhores.</em></h1>
+ <p>Receitas feitas com carinho, ingredientes frescos e aquele sabor que transforma qualquer dia em uma ocasião especial.</p>
+ <a class="primary-button" href="#cardapio">Explorar cardápio <span>↗</span></a>
+ <div class="proof"><div class="avatars"><span>J</span><span>M</span><span>A</span></div><div><b>★ 4,9/5</b><small>Mais de 1.200 clientes satisfeitos</small></div></div></div>
+ <div class="hero-art"><div class="hero-image" role="img" aria-label="Comida artesanal"></div><div class="floating-note"><b>✦</b><span><strong>Feito na hora</strong><small>Fresquinho, sempre.</small></span></div><div class="stamp">AMOR EM<strong>CADA<br>MORDIDA</strong><small>DESDE 2018</small></div></div>
+</section>
+<section class="menu-section" id="cardapio">
+ <div class="section-heading"><div><div class="eyebrow">— ESCOLHAS DA COZINHA</div><h2>Nosso <em>cardápio</em></h2><p>Preparado com cuidado. Servido com alegria.</p></div>
+ <label class="search">⌕ <input [(ngModel)]="searchTerm" type="search" placeholder="Buscar prato..." aria-label="Buscar prato"></label></div>
+ <div class="categories"><button *ngFor="let c of categories" [class.selected]="activeCategory===c" (click)="activeCategory=c">{{c}}</button></div>
+ <p class="api-message" *ngIf="loading">Carregando cardápio...</p><p class="api-message error" *ngIf="errorMessage">{{errorMessage}}</p><div class="dish-grid" *ngIf="!loading && filteredDishes.length;else empty">
+  <article class="dish-card" *ngFor="let dish of filteredDishes">
+   <div class="dish-image"><img [src]="dish.imageUrl || 'assets/prato-placeholder.svg'" [alt]="dish.name" loading="lazy"><span *ngIf="dish.badge" class="badge">{{dish.badge}}</span><button class="quick-add" (click)="addToCart(dish)" [attr.aria-label]="'Adicionar '+dish.name">+</button></div>
+   <div class="dish-info"><small class="dish-category">{{dish.category}}</small><div class="dish-title"><h3>{{dish.name}}</h3><span>★ 4.9</span></div><p>{{dish.description}}</p><div class="dish-footer"><strong>{{formatPrice(dish.price)}}</strong><button (click)="addToCart(dish)">Adicionar <b>+</b></button></div></div>
+  </article>
+ </div>
+ <ng-template #empty><div class="empty"><h3>Nenhum prato encontrado</h3><p>Tente outro termo ou categoria.</p></div></ng-template>
+</section>
+<section class="story" id="sobre"><div class="story-mark">✳</div><div><small>NOSSA FILOSOFIA</small><h2>Simples no conceito.<br><em>Inesquecível no sabor.</em></h2></div><p>Acreditamos que uma boa refeição começa com bons ingredientes e termina com uma boa memória. É por isso que cada detalhe importa.</p></section>
+</main>
+<footer><a class="brand" href="#inicio"><span class="brand-mark">S</span><span>Sabor<span class="accent">ê.</span></span></a><span>Feito com carinho, servido com sabor.</span><span>© 2026 Saborê Cozinha Artesanal</span></footer>
+</div>
+<div class="overlay" *ngIf="cartOpen" (click)="cartOpen=false">
+<aside class="drawer" (click)="$event.stopPropagation()">
+ <div class="drawer-head"><div><small>SUA SELEÇÃO</small><h2>Meu pedido ({{cartCount}})</h2></div><button class="close" (click)="cartOpen=false" aria-label="Fechar">×</button></div>
+ <div class="cart-empty" *ngIf="!cart.length"><span>🛍</span><h3>Seu carrinho está vazio</h3><p>Escolha seus pratos favoritos para começar.</p><button class="primary-button" (click)="cartOpen=false">Ver cardápio</button></div>
+ <div class="cart-items" *ngIf="cart.length"><article class="cart-item" *ngFor="let item of cart"><img [src]="item.dish.imageUrl || 'assets/prato-placeholder.svg'" [alt]="item.dish.name"><div class="cart-item-info"><h3>{{item.dish.name}}</h3><strong>{{formatPrice(item.dish.price*item.quantity)}}</strong><div class="qty"><button (click)="changeQuantity(item.dish.id,-1)">−</button><span>{{item.quantity}}</span><button (click)="changeQuantity(item.dish.id,1)">+</button></div></div><button class="remove" (click)="removeFromCart(item.dish.id)" aria-label="Remover item">×</button></article></div>
+ <div class="drawer-bottom" *ngIf="cart.length"><div class="total"><span>Subtotal</span><strong>{{formatPrice(cartTotal)}}</strong></div><div class="delivery"><span>Entrega</span><span>Calculada na próxima etapa</span></div><button class="checkout" (click)="checkout()" [disabled]="submittingOrder">{{submittingOrder ? 'Enviando pedido...' : 'Finalizar pedido'}} <span>→</span></button><small class="note">Seu pedido será registrado no sistema.</small></div>
+</aside></div>
